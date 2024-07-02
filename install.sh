@@ -138,8 +138,8 @@ case $SKIP_HYPR_AUR in
   *)
 	  hyprland_installflags="-S"
 	  $ask || hyprland_installflags="$hyprland_installflags --noconfirm"
-    v yay $hyprland_installflags --asdeps hyprutils-git hyprlang-git hyprcursor-git hyprwayland-scanner-git
-    v yay $hyprland_installflags --answerclean=a hyprland-git
+    v yay $hyprland_installflags --asdeps hyprutils hyprlang hyprcursor hyprwayland-scanner
+    v yay $hyprland_installflags --answerclean=a hyprland
     ;;
 esac
 
@@ -187,7 +187,7 @@ v mkdir -p $XDG_BIN_HOME $XDG_CACHE_HOME $XDG_CONFIG_HOME $XDG_DATA_HOME
 case $SKIP_MISCCONF in
   true) sleep 0;;
   *)
-    for i in $(find .config/ -mindepth 1 -maxdepth 1 ! -name 'ags' ! -name 'fish' ! -name 'hypr' -exec basename {} \;); do
+    for i in $(find .config/ -mindepth 1 -maxdepth 1 -exec basename {} \;); do
 #      i=".config/$i"
       echo "[$0]: Found target: .config/$i"
       if [ -d ".config/$i" ];then v rsync -av --delete ".config/$i/" "$XDG_CONFIG_HOME/$i/"
@@ -196,57 +196,6 @@ case $SKIP_MISCCONF in
     done
     ;;
 esac
-
-case $SKIP_FISH in
-  true) sleep 0;;
-  *)
-    v rsync -av --delete .config/fish/ "$XDG_CONFIG_HOME"/fish/
-    ;;
-esac
-
-# For AGS
-case $SKIP_AGS in
-  true) sleep 0;;
-  *)
-    v rsync -av --delete --exclude '/user_options.js' .config/ags/ "$XDG_CONFIG_HOME"/ags/
-    t="$XDG_CONFIG_HOME/ags/user_options.js"
-    if [ -f $t ];then
-      echo -e "\e[34m[$0]: \"$t\" already exists.\e[0m"
-      # v cp -f .config/ags/user_options.js $t.new
-      existed_ags_opt=y
-    else
-      echo -e "\e[33m[$0]: \"$t\" does not exist yet.\e[0m"
-      v cp .config/ags/user_options.js $t
-      existed_ags_opt=n
-    fi
-    ;;
-esac
-
-# For Hyprland
-case $SKIP_HYPRLAND in
-  true) sleep 0;;
-  *)
-    v rsync -av --delete --exclude '/custom' --exclude '/hyprland.conf' .config/hypr/ "$XDG_CONFIG_HOME"/hypr/
-    t="$XDG_CONFIG_HOME/hypr/hyprland.conf"
-    if [ -f $t ];then
-      echo -e "\e[34m[$0]: \"$t\" already exists.\e[0m"
-      v cp -f .config/hypr/hyprland.conf $t.new
-      existed_hypr_conf=y
-    else
-      echo -e "\e[33m[$0]: \"$t\" does not exist yet.\e[0m"
-      v cp .config/hypr/hyprland.conf $t
-      existed_hypr_conf=n
-    fi
-    t="$XDG_CONFIG_HOME/hypr/custom"
-    if [ -d $t ];then
-      echo -e "\e[34m[$0]: \"$t\" already exists, will not do anything.\e[0m"
-    else
-      echo -e "\e[33m[$0]: \"$t\" does not exist yet.\e[0m"
-      v rsync -av --delete .config/hypr/custom/ $t/
-    fi
-    ;;
-esac
-
 
 # some foldes (eg. .local/bin) should be processed separately to avoid `--delete' for rsync,
 # since the files here come from different places, not only about one program.
@@ -289,7 +238,7 @@ printf "https://end-4.github.io/dots-hyprland-wiki/en/i-i/01setup/#post-installa
 printf "for hints on launching Hyprland.\e[0m\n"
 printf "\n"
 printf "\e[36mIf you are already running Hyprland,\e[0m\n"
-printf "\e[36mPress \e[30m\e[46m Ctrl+Super+T \e[0m\e[36m to select a wallpaper\e[0m\n"
+printf "\e[36mPress \e[30m\e[46m Shift+Super+←/→ \e[0m\e[36m to select a wallpaper\e[0m\n"
 printf "\e[36mPress \e[30m\e[46m Super+/ \e[0m\e[36m for a list of keybinds\e[0m\n"
 printf "\n"
 
